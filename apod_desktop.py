@@ -12,7 +12,9 @@ Parameters:
   apod_date = APOD date (format: YYYY-MM-DD)
 """
 from datetime import date
+import datetime
 import os
+import sys
 import image_lib
 import inspect
 
@@ -54,6 +56,29 @@ def get_apod_date():
     """
     # TODO: Complete function body
     apod_date = date.fromisoformat('2022-12-25')
+
+    today_date = datetime.today().date()
+    last_date = datetime(1995, 6, 16).date()
+
+    if sys.argv[-1] != os.path.basename(__file__): apod_date = sys.argv[-1]
+    else: apod_date = today_date
+
+    try:
+        apod_date = datetime.fromisoformat(apod_date).date()
+        try:
+            if apod_date < last_date: 
+                raise Exception("Error: APOD date cannot be before 1995-06-16") 
+            elif apod_date > today_date: 
+                raise Exception("Error: APOD date cannot be in the future")
+            else: 
+                pass
+        except Exception as e: 
+            print(str(e))
+            sys.exit("Script execution aborted")
+    except Exception as e:
+        print("Error: Invalid date format; " + str(e))
+    
+
     return apod_date
 
 def get_script_dir():
