@@ -14,6 +14,7 @@ Parameters:
 from datetime import date
 import datetime
 import os
+import sqlite3
 import sys
 import image_lib
 import inspect
@@ -109,6 +110,37 @@ def init_apod_cache(parent_dir):
     # TODO: Create the image cache directory if it does not already exist
     # TODO: Determine the path of image cache DB
     # TODO: Create the DB if it does not already exist
+
+    def create_database():
+        connection = sqlite3.connect("./images/image_cache.db")
+        cur = connection.cursor()
+
+        with open("schema.sql", 'r') as f:
+            query = f.read()
+            cur.executescript(query)
+
+        connection.commit()
+        connection.close()
+
+    image_dir_name = 'images'
+    image_cache_dir = '/'.join([parent_dir, image_dir_name])
+
+    print("Image cache directory: ", image_cache_dir)
+
+    if not os.path.exists(image_cache_dir):
+        os.makedirs(image_cache_dir)
+        print("Image cache directory created.")
+    else:
+        print("Image cache directory already exists.")
+
+    image_cache_db = parent_dir + "/images/image_cache.db"
+    print("Image cache directory: ", image_cache_db)
+
+    if not os.path.exists(image_cache_db): 
+        create_database()
+        print("Image cache DB created.")
+    else:
+        print("Image cache DB already exists.")
 
 def add_apod_to_cache(apod_date):
     """Adds the APOD image from a specified date to the image cache.
