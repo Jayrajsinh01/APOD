@@ -2,6 +2,9 @@
 Library for interacting with NASA's Astronomy Picture of the Day API.
 '''
 
+import sys
+import nasapy
+
 def main():
     # TODO: Add code to test the functions in this module
     return
@@ -16,7 +19,20 @@ def get_apod_info(apod_date):
     Returns:
         dict: Dictionary of APOD info, if successful. None if unsuccessful
     """
-    return   
+    apod_date = apod_date.isoformat()
+    print(f"Getting {apod_date} APOD information from NASA...", end='')
+    try:
+        with open('api.txt', 'r') as f:
+            api_key = f.read()
+
+        nasa = nasapy.Nasa(key=api_key)
+        apod = nasa.picture_of_the_day(date=apod_date)
+
+        print("success")
+        return apod 
+    except Exception as e:
+        print(str(e))
+        sys.exit("Process aborted")
 
 def get_apod_image_url(apod_info_dict):
     """Gets the URL of the APOD image from the dictionary of APOD information.
