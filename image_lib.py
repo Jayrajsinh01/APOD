@@ -1,6 +1,9 @@
 '''
 Library of useful functions for working with images.
 '''
+import requests
+
+
 def main():
     # TODO: Add code to test the functions in this module
     return
@@ -17,7 +20,16 @@ def download_image(image_url):
         bytes: Binary image data, if succcessful. None, if unsuccessful.
     """
     # TODO: Complete function body
-    return
+    print("APOD URL: ", image_url)
+    print(f"Downloading image from\n{image_url}...", end='')
+    try:
+        image_data = requests.get(image_url)
+        print("success")
+
+        return image_data.content
+    except Exception as e:
+        print(str(e))
+        return None
 
 def save_image_file(image_data, image_path):
     """Saves image data as a file on disk.
