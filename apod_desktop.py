@@ -13,11 +13,14 @@ Parameters:
 """
 from datetime import date
 import datetime
+import hashlib
 import os
 import sqlite3
 import sys
 import image_lib
 import inspect
+
+import apod_api
 
 # Global variables
 image_cache_dir = None  # Full path of image cache directory
@@ -162,7 +165,29 @@ def add_apod_to_cache(apod_date):
     # TODO: Check whether the APOD already exists in the image cache
     # TODO: Save the APOD file to the image cache directory
     # TODO: Add the APOD information to the DB
-    return 0
+    apod = apod_api.get_apod_info(apod_date)
+
+    title = apod["title"]
+    explanation = apod ["explanation"]
+    print(f"APOD title: {title}")
+
+    image_url = apod_api.get_apod_image_url(apod)
+    img_path = determine_apod_file_path(title, image_url)
+    image_data = image_lib.download_image(image_url)
+
+    if image_data is not None:
+        image_hash = hashlib.sha256(image_data).hexdigest()
+        print(f"APOD SHA-256: {image_hash}")
+
+    apod_id = get_apod_id_from_db(image_hash)
+
+    if apod_id:
+        print("APOD image is already in cache.")
+    else:
+        print("APOD image is not already in cache.")
+        image_lib.save_image_file(image_data, img_path)
+        apod_id = add_apod_to_db(title, explanation, img_path, image_hash)
+    return apod_id
 
 def add_apod_to_db(title, explanation, file_path, sha256):
     """Adds specified APOD information to the image cache DB.
