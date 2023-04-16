@@ -2,6 +2,9 @@
 Library for interacting with NASA's Astronomy Picture of the Day API.
 '''
 
+import http
+import json
+import re
 import sys
 import nasapy
 
@@ -34,7 +37,7 @@ def get_apod_info(apod_date):
         print(str(e))
         sys.exit("Process aborted")
 
-def get_apod_image_url(apod_info_dict):
+def get_apod_image_url(apod):
     """Gets the URL of the APOD image from the dictionary of APOD information.
 
     If the APOD is an image, gets the URL of the high definition image.
@@ -46,7 +49,35 @@ def get_apod_image_url(apod_info_dict):
     Returns:
         str: APOD image URL
     """
-    return
+    if apod["media_type"] == "image":
+        
+        return apod["hdurl"]
+        
+    elif apod["media_type"] == "video":  
+        
+        img_url = apod["url"]
+
+        if "youtube" in img_url or "youtu.be" in img_url:
+            youtube_id_regex = re.compile("(?:(?<=(v|V)/)|(?<=be/)|(?<=(\?|\&)v=)|(?<=embed/))([\w-]+)")
+            video_id = youtube_id_regex.findall(img_url)
+            video_id = ''.join(''.join(elements) for elements in video_id).replace("?", "").replace("&", "")
+            video_thumb = "https://img.youtube.com/vi/" + video_id + "/0.jpg"
+
+        elif "vimeo" in img_url:
+            # get ID from Vimeo URL
+            vimeo_id_regex = re.compile("(?:/video/)(\d+)")
+            vimeo_id = vimeo_id_regex.findall(img_url)[0]
+            # make an API call to get thumbnail URL
+            vimeo_request = http.request("GET", "https://vimeo.com/api/v2/video/" + vimeo_id + ".json")
+            data = json.loads(vimeo_request.data.decode('utf-8'))
+            video_thumb = data[0]['thumbnail_large']
+
+        else:
+            video_thumb = ""
+
+        return video_thumb
+    else:
+        return
 
 if __name__ == '__main__':
     main()
