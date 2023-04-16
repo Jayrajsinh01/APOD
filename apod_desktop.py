@@ -219,7 +219,12 @@ def determine_apod_file_path(image_title, image_url):
         str: Full path at which the APOD image file must be saved in the image cache directory
     """
     # TODO: Complete function body
-    return
+    extension = str(image_url).split('.')[-1]
+    name = image_title.replace(" ", "_").replace(":", "_") + f".{extension}"
+
+    path = '/'.join([image_cache_dir, name])
+
+    return path
 
 def get_apod_info(image_id):
     """Gets the title, explanation, and full path of the APOD having a specified
