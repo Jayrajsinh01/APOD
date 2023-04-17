@@ -17,6 +17,7 @@ import hashlib
 import os
 import sqlite3
 import sys
+import uuid
 import image_lib
 import inspect
 
@@ -46,6 +47,16 @@ def main():
     # Set the APOD as the desktop background image
     if apod_id != 0:
         image_lib.set_desktop_background_image(apod_info['file_path'])
+
+
+def get_database_connection():
+    """
+    Returns: connection to the database
+    """
+    conn = sqlite3.connect("./images/image_cache.db")
+    conn.row_factory = sqlite3.Row
+    return conn
+
 
 def get_apod_date():
     """Gets the APOD date
@@ -202,7 +213,21 @@ def add_apod_to_db(title, explanation, file_path, sha256):
         int: The ID of the newly inserted APOD record, if successful.  Zero, if unsuccessful       
     """
     # TODO: Complete function body
-    return 0
+    try:
+        print("Adding APOD to image cache DB...", end='')
+        id = uuid.uuid4().hex
+
+        conn = get_database_connection()
+        conn.execute("INSERT INTO apod_data VALUES(?, ?, ?, ?, ?)", (id, title, explanation, file_path, sha256))
+        conn.commit()
+        conn.close()
+
+        print("success")
+        return id
+
+    except Exception as e:
+        print(str(e))
+        return 0
 
 def get_apod_id_from_db(image_sha256):
     """Gets the record ID of the APOD in the cache having a specified SHA-256 hash value
