@@ -44,7 +44,17 @@ def save_image_file(image_data, image_path):
         bytes: True, if succcessful. False, if unsuccessful
     """
     # TODO: Complete function body
-    return
+    print(f"APOD file path: {image_path}")
+
+    try:
+        print(f"Saving image file as {image_path}...", end='')
+        with open(image_path, 'wb') as f:
+            f.write(image_data)
+            print("success")
+            return True
+    except Exception as e:
+        print(str(e))
+        return False
 
 def set_desktop_background_image(image_path):
     """Sets the desktop background image to a specific image.
