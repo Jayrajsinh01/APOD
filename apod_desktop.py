@@ -241,7 +241,14 @@ def get_apod_id_from_db(image_sha256):
         int: Record ID of the APOD in the image cache DB, if it exists. Zero, if it does not.
     """
     # TODO: Complete function body
-    return 0
+    conn = get_database_connection()
+
+    apod_id = conn.execute("SELECT id FROM apod_data WHERE SHA_hash = ?", (image_sha256,)).fetchone()
+
+    if apod_id:
+        return apod_id['id']
+    else:
+        return 0
 
 def determine_apod_file_path(image_title, image_url):
     """Determines the path at which a newly downloaded APOD image must be 
@@ -288,10 +295,14 @@ def get_apod_info(image_id):
     """
     # TODO: Query DB for image info
     # TODO: Put information into a dictionary
+    conn = get_database_connection()
+    data = conn.execute("SELECT title, explanation, img_path FROM apod_data WHERE id = ?", (str(image_id),)).fetchone()
+    conn.close()
+
     apod_info = {
-        #'title': , 
-        #'explanation': ,
-        'file_path': 'TBD',
+        'title': data["title"], 
+        'explanation': data["explanation"],
+        'file_path': data["img_path"],
     }
     return apod_info
 
