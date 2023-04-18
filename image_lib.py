@@ -1,6 +1,7 @@
 '''
 Library of useful functions for working with images.
 '''
+import ctypes
 import requests
 
 
@@ -66,7 +67,14 @@ def set_desktop_background_image(image_path):
         bytes: True, if succcessful. False, if unsuccessful        
     """
     # TODO: Complete function body
-    return
+    print(f"Setting desktop to {image_path}...", end='')
+    try:
+        ctypes.windll.user32.SystemParametersInfoW(20, 0, image_path, 3)
+        print("success")
+        return True
+    except Exception as e:
+        print(str(e))    
+        return False
 
 def scale_image(image_size, max_size=(800, 600)):
     """Calculates the dimensions of an image scaled to a maximum width
