@@ -92,7 +92,6 @@ def get_apod_date():
     except Exception as e:
         print("Error: Invalid date format; " + str(e))
     
-
     return apod_date
 
 def get_script_dir():
