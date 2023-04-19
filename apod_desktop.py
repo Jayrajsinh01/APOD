@@ -11,8 +11,8 @@ Usage:
 Parameters:
   apod_date = APOD date (format: YYYY-MM-DD)
 """
-from datetime import date
-import datetime
+from datetime import datetime
+# import datetime
 import hashlib
 import os
 import sqlite3
@@ -70,7 +70,6 @@ def get_apod_date():
         date: APOD date
     """
     # TODO: Complete function body
-    apod_date = date.fromisoformat('2022-12-25')
 
     today_date = datetime.today().date()
     last_date = datetime(1995, 6, 16).date()
